@@ -1,0 +1,101 @@
+from flask import Flask, render_template, request
+from flask_json import FlaskJSON, json_response,jsonify,as_json,json_response,JsonError
+from myBookStore import GetDb
+import jwt
+import bcrypt
+import datetime
+from psycopg2 import sql
+from db_con import get_db_instance, get_db
+
+app = Flask(__name__)
+FlaskJSON(app)
+global_db_con = get_db()
+
+JWT_TOKEN = None
+JWT_SECRET = None
+with open("secret","r") as f:
+	JWT_SECRET = f.read()
+
+# Default 
+@app.route("/", methods=["GET"])
+def Index():
+    return  'Web app for dummies :)'
+
+
+# get list of books
+@ app.route("/getBookList", methods=["GET"])
+def FetchBookList():
+    cursor = global_db_con.cursor()
+    cursor.execute("select * from books;")
+
+    count = 0
+    message = "{BooksList:{"
+    while 1:
+        row = cursor.fetchone()
+        if row is None:
+            break
+        else:
+            if count > 0:
+                message += ","
+            message += "{name:" + row[1]  + "}"
+            count += 1
+    message += "}\}"
+
+    print("Returning the books list from DB")
+    return json_response(data=message)
+
+#login endpoint
+@app.route('/login', methods=['POST'])
+def login():
+    username = request.form.get('username')
+    password = request.form.get('password')
+    cur = global_db_con.cursor()
+    cur.execute("SELECT password FROM users WHERE username = '"+username+"';")  #had to put fake quotes -____- whyyy
+    passwordIn = cur.fetchone()
+    cur.close()
+   
+    print(username)
+    print("passowrdIn")
+    print(passwordIn)
+    print("password.encode(utf-8)")
+    print(password.encode('utf-8'))
+    print("str.encode(passwordIn[0]")
+    print(str.encode(passwordIn[0]))
+    print("password=request.form.get('password')")
+    print(password)
+#    return json_response(a=passwordIn)
+    if passwordIn is None:
+        print("Username " + username + "does not exist.")
+        return jsonify(logon=False)
+
+    if not bcrypt.checkpw( bytes(password.encode('utf-8')), str.encode(passwordIn[0])):
+        print('Invalid password!')
+        return jsonify(logon = False)
+    encodedJWT=jwt.encode({'username':username,'password':passwordIn[0]}, JWT_SECRET, algorithm="HS256")
+    return jsonify(jwt=encodedJWT, logon = True)
+
+
+# signup endpoint 
+@app.route('/signup', methods=['POST'])
+def signup():
+    username = request.form.get('username')
+    password = request.form.get('password')
+
+    cursor = global_db_con.cursor()
+    cursor.execute("SELECT username FROM users WHERE username = '"+username+"';")
+    checkuser=cursor.fetchone()
+    if checkuser == username:
+        return jsonify(logon=False)
+    else:
+        saltedPass = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt(10))
+        print(saltedPass)
+        unsaltedPass=saltedPass.decode('utf-8')
+        print(unsaltedPass)
+        cursor.execute("insert into users(username,password) values ('"+username+"','"+unsaltedPass+"');")
+        global_db_con.commit()
+        print("Created user ",username)
+        encoded_JWT=jwt.encode({'username':username,'password':unsaltedPass},JWT_SECRET, algorithm="HS256")
+        return jsonify(jwt=encoded_JWT,logon=True)
+
+
+app.run(host="0.0.0.0", port=80)

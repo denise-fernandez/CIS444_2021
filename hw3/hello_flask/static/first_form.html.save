@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+    <head>
+	     <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+    </head>
+    <body>
+
+	<script>
+		function check_form(){
+
+			alert($('#fname').val());
+			alert($('#pass').val());
+
+			$('#signup').hide();
+			$('#login').show();
+			
+			return false;
+
+			if($('#fname').val().length == 0){
+				return false;
+			}else{
+				return true;
+			}
+		}
+
+		function check_form2(){
+
+                        $('#login').hide();
+                        $('#books').show();
+
+                        $('#booklist').append('<option value="bookA">book1</option>',
+						'<option value="bookB">book2</option>')
+
+
+                        return false;
+
+                        if($('#fname').val().length == 0){
+                                return false;
+                        }else{
+                                return true;
+                        }
+                }
+
+
+		function check_form3(){
+
+                        alert($('#booklist').val());
+                        
+
+                        
+                        $('#books').show();
+
+                        $('#booklist').append('<option value="bookA">bookB</option>','<option value="bookB">bookB</option>')
+
+
+                        return false;
+                }
+
+
+<!--</script>
+            <div id="signup">
+	    	<form action="/signup" method="post">
+ 		     <h1>Signup</h1>
+
+  			<label for="fname">First name:</label><br>
+  				<input type="text" id="fname" name="fname" value="JillV"><br>
+  			<label for="pass">Password:</label><br>
+  				<input type="password" id="pass" name="pass" value="123"><br><br>
+  			<input type="submit" value="Signup">
+		</form>
+	    </div>-->
+	    <div id="login" style="display:none">
+ 		<form action="/login" method="post">
+
+                    <h1>Login</h1>
+
+                        <label for="fname">Username:</label><br>
+                                <input type="text" id="fname" name="fname" value="JillV"><br>
+                        <label for="pass">Password:</label><br>
+                                <input type="password" id="pass" name="pass" value="123"><br><br>
+                        <input type="submit" value="Login" onclick="return check_form2()">
+		     </form>
+            </div>
+
+
+	    <div id="books" style="display:none">
+             	 <form action="/getBookList" method="get">
+
+		    <h1>Buy me</h1>
+		    <select name="booklist" id="booklist">
+			 <input type="submit" value="Submit">
+	
+  		    </select>
+		</form>
+	    </div>
+	    
+
+    </body>
+</html>
