@@ -14,7 +14,7 @@
 			$('#login').hide();
 			$('#books').show();
 			
-			$('#cars').append('<option value="volvo">Thank you Taco</option>')
+			$('#booklist').append('<option value="bookA">book1</option>')
 
 
 			return false;
@@ -25,6 +25,22 @@
 				return true;
 			}
 		}
+
+
+		function check_form2(){
+
+                        alert($('#booklist').val());
+                        
+
+                        
+                        $('#books').show();
+
+                        $('#booklist').append('<option value="bookA">bookB</option>','<option value="bookB">bookB</option>')
+
+
+                        return false;
+                }
+
 
 	</script>
             <div id="login">
@@ -39,10 +55,12 @@
 
 	    <div id="books" style="display:none">
 		    <h1>Buy me</h1>
-		    <select name="cars" id="cars">
-
+		    <select name="booklist" id="booklist">
+			 <input type="submit" value="Submit"  onclick="return check_form2();">
+	
   		    </select>
 	    </div>
+	    
 
     </body>
 </html>
