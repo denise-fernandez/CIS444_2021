@@ -160,7 +160,7 @@
           "username": document.getElementById("#username").value,
           "password": document.getElementById("#password").value }, "json");
       if (response.status == 200){
-          
+          jwt = data.token
           token = await response.data;
           get_books();
       }else{
