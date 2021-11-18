@@ -14,8 +14,11 @@ from tools.token_required import token_required
 from tools.get_aws_secrets import get_secrets
 
 from tools.logging import logger
+global JWT
 
-def signup():
+def handle_request():
+    logger.debug("Signup Handle Request")
+
     username = request.form.get('username')
     password = request.form.get('password')
 
@@ -23,7 +26,6 @@ def signup():
 
     cur.execute("select username from users where username = '" + username + "';")
     userid = cur.fetchone()
-    
 
     if userid == username:
         print("That username already exists, try another")
@@ -36,6 +38,6 @@ def signup():
         cur.close()
         g.db.commit()
 
-        print("Created the following user: " + username + ".")
-        encoded_JWT=jwt.encode({'username':username,'password':saltedpassword.decode('utf-8')},JWT_SECRET, algorithm="HS256")
+        print("Created the following user: " + username)
+        encoded_JWT=jwt.encode({'username':username,'password':saltedpassword.decode('utf-8')}, g.secrets['JWT'], algorithm="HS256")
         return json_response(data={"message": username +" created successfully."})

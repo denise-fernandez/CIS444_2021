@@ -15,48 +15,6 @@ from tools.logging import logger
 
 global JWT
 
-def login():
-    username = request.form.get('username')
-    password = request.form.get('password')
-    cur = g.db.cursor()
-
-    cur.execute("select password from users where username = '" + username + "';")
-    userIn = cur.fetchone() #user
-    cur.close() 
-    
-    cur = g.db.cursor()
-    cur.execute("select id from users where username = '" + username + "';")
-    userID = cur.fetchone() #user
- 
-    cur.close()
-
-    print("username")
-    print(username)
-    print("userIn")
-    print(userIn)
-    print("password.encode(utf-8)")
-    print(password.encode('utf-8'))
-    print("password")
-    print(password)
-    print("userID")
-    print(userID)
-
-    #check if the user credentials exists in users DB
-    if userIn is None:  #creds don't match anything in db
-        print("User doesn't exists")
-        return json_response( data={"message": "Invalid User: " +username}, status =404)##
-
-    #user and password match db
-    if bcrypt.checkpw(bytes(password.encode('utf-8')), str.encode(userIn[0])) == True:
-        print("Signed in as: " + username)
-	
-        JWT = jwt.encode( {"id": userID, "username": username, "password":userIn}, g.secrets['JWT'], algorithm="HS256")#
-
-        return json_response( data={"jwt": JWT})
-    else:
-        print("Incorrect password")
-        return json_response( data={"message": "Incorrect Password"}, status = 404)
-
 
 def handle_request():
     logger.debug("Login Handle Request")
@@ -127,4 +85,3 @@ def handle_request():
         return json_response( data={"message": "Incorrect Password"}, status = 404)
 
     return json_response( token = create_token(user) , authenticated = False)
-
