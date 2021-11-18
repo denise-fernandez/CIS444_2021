@@ -1,7 +1,7 @@
 from flask import Flask,render_template,request, redirect, url_for, g
 from flask_json import FlaskJSON, JsonError, json_response, as_json
 import jwt
-
+import psycopg2  
 import sys
 import datetime
 import bcrypt
@@ -18,70 +18,32 @@ global JWT
 
 def handle_request():
     logger.debug("Login Handle Request")
-    username = request.form.get('username')
-    password = request.form.get('password')
-    cur = g.db.cursor()
-
-    cur.execute("select password from users where username = '" + username + "';")
-    userIn = cur.fetchone() #user
-    cur.close()
-
-    cur = g.db.cursor()
-    cur.execute("select id from users where username = '" + username + "';")
-    userID = cur.fetchone() #user
-
-    cur.close()
-
-    print("username")
-    print(username)
-    print("userIn")
-    print(userIn)
-    print("password.encode(utf-8)")
-    print(password.encode('utf-8'))
-    print("password")
-    print(password)
-    print("userID")
-    print(userID)
-
+    #use data here to auth the user
+    password_from_user_form = request.form['password']
     user = {
             "sub" : request.form['username'] #sub is used by pyJwt as the owner of the token
             }
+
     cur = g.db.cursor()
+    cur.execute("select * from users where username = '" + request.form.get('username') + "';")
+    dbcredz = cur.fetchone()
+    cur.close()
+    #print(dbcredz)
 
-    cur.execute("select id from users where username = '" + username + "';")
-    userid = cur.fetchone()
-    print(userid)
-    if not user:
-        print("in if not user")
+    if dbcredz is None:
+        logger.debug("No User")
         return json_response(status_=401, message = 'Invalid credentials', authenticated =  False )
-    
-    print(user)
-    
-    print("username")
-    print(username)
-    print("userIn")
-    print(userIn)
-    print("password.encode(utf-8)")
-    print(password.encode('utf-8'))
-    print("password")
-    print(password)
-    print("userID")
-    print(userID)
-
-    #check if the user credentials exists in users DB
-    if userIn is None:  #creds don't match anything in db
-        print("User doesn't exists")
-        return json_response( data={"message": "Invalid User: " +username}, status =404)##
-
-    #user and password match db
-    if bcrypt.checkpw(bytes(password.encode('utf-8')), str.encode(userIn[0])) == True:
-        print("Signed in as: " + username)
-
-        JWT = jwt.encode( {"id": userID, "username": username, "password":userIn}, g.secrets['JWT'], algorithm="HS256")#
-
-        return json_response( data={"jwt": JWT})
     else:
-        print("Incorrect password")
-        return json_response( data={"message": "Incorrect Password"}, status = 404)
+        if bcrypt.checkpw(bytes(request.form.get('password'), "utf-8"), bytes(dbcredz[2], "utf-8")) == True:
+            logger.debug("Successful Login, : " + str(user))
+
+        else:
+            return json_response(status_=401, message = 'Invalid password', authenticated =  False )
+
+    return json_response( token = create_token(user) , authenticated = True)
+
+
+    if not user:
+        return json_response(status_=401, message = 'Invalid credentials', authenticated =  False )
 
     return json_response( token = create_token(user) , authenticated = False)

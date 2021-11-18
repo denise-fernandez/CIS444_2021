@@ -81,9 +81,9 @@
      <div id="credbox">
           <h2>Login</h2>
             <label>Username:</label><br>
-                <input type="text" id="username" name="username"><br>
+                <input type="text" id="#username" name="username"><br>
             <label>Password:</label><br>
-                <input type="password"required id="password" name="password" ><br><br>
+                <input type="password"required id="#password" name="password" ><br><br>
             <button type="button" onclick="return login()">Log In</button>
             <h3>Need an account?</h3>
 		<button type="button" onclick="return signupform()">Create Account</button>
@@ -161,23 +161,23 @@
    function login(){
       $("#login").show();
       $("#signup").hide();
-		
-      $.post("/open_api/login",{
-          "username": $('#username').val(), "password":$('#password').val() },
-	   function(data, textStatus) {
-		//this gets called when browser receives response from server
-		console.log(data.token);
-		//Set global JWT
-		jwt = data.token;
-		//make secure call with the jwt
-		get_books();
-        }, "json").fail(function(response){
-		console.log("error");
-		console.log(response);
-	});
-	return false;
-	
-  }
+function login(){
+			$.post("/open_api/login", { "username":$('#username').val(), "password":$('#password').val()},
+                       		function(data, textStatus) {
+					//this gets called when browser receives response from server
+					console.log(data.token);
+					//Set global JWT
+					jwt = data.token;
+
+					//make secure call with the jwt
+					get_books();
+				}, "json").fail( function(response) {
+					//this gets called if the server throws an error
+					console.log("error");
+					console.log(response);
+				});
+			return false;
+  }		
 
   async function signupform(){
       $("#login").hide();
@@ -196,18 +196,17 @@
       const response = await $.post("/open_api/signup",{
 	  "username": document.getElementById("#username2").value,
 	  "password": document.getElementById("#password2").value }, "json");
-      token = response.data;
+      token = await response.data;
 
       return true;
   }
 
-function get_books(){
-	$('#login').hide();
-	console.log("in get_books()");
-        secure_get_with_token("/secure_api/get_books", function(data){console.log("got books"); console.log(data)},
-                        function(err){ console.log(err) });
-  }
-  
+  function get_books(){
+      //make secure call with the jwt
+      secure_get_with_token("/secure_api/get_books", function(data){console.log("got books"); console.log(data)},
+                                                function(err){ console.log(err) });  
+  } 
+
   async function getbookstore(){
       $("#login").hide();
       $("#cart-form").hide();
