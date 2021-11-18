@@ -201,7 +201,7 @@
       return true;
   }
 
-function get_books(){
+  function get_books(){
 	$('#login').hide();
 	console.log("in get_books()");
         secure_get_with_token("/secure_api/get_books", function(data){console.log("got books"); console.log(data)},

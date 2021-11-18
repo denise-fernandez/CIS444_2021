@@ -13,37 +13,32 @@ from tools.token_tools import create_token
 
 from tools.logging import logger
 
-global JWT
-
 
 def handle_request():
     logger.debug("Login Handle Request")
     #use data here to auth the user
-    password_from_user_form = request.form['password']
+    pfu = request.form['password']
     user = {
             "sub" : request.form['username'] #sub is used by pyJwt as the owner of the token
             }
 
     cur = g.db.cursor()
-    cur.execute("select * from users where username = '" + request.form.get('username') + "';")
+    cur.execute("select * from users where username = '" + request.form['username'] + "';")
     dbcredz = cur.fetchone()
     cur.close()
     #print(dbcredz)
 
     if dbcredz is None:
         logger.debug("No User")
-        return json_response(status_=401, message = 'Invalid credentials', authenticated =  False )
+        return json_response(status_=401, message = 'No user exists', authenticated =  False )
     else:
-        if bcrypt.checkpw(bytes(request.form.get('password'), "utf-8"), bytes(dbcredz[2], "utf-8")) == True:
-            logger.debug("Successful Login, : " + str(user))
-
+        if bcrypt.checkpw(bytes(pfu, "utf-8"), bytes(dbcredz[2], "utf-8")) == True:
+            logger.debug("Successful Login for : " + request.form['username'] )
+            return json_response( token= create_token(user), authenticated = True)
         else:
-            return json_response(status_=401, message = 'Invalid password', authenticated =  False )
-
-    return json_response( token = create_token(user) , authenticated = True)
-
+            return json_response(status_ = 401, data={"message": "Incorrect Password"}, authenticated = False)
 
     if not user:
         return json_response(status_=401, message = 'Invalid credentials', authenticated =  False )
 
-    return json_response( token = create_token(user) , authenticated = False)
+    return json_response( token = create_token(user) , authenticated = True)
