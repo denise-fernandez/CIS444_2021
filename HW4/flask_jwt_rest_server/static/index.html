@@ -179,12 +179,12 @@
 	
   }
 
-  async function signupform(){
+  function signupform(){
       $("#login").hide();
       $("#signup").show();
   }
 
-  async function loginform(){
+  function loginform(){
       $("#login").show();
       $("#signup").hide();
   }
@@ -207,7 +207,8 @@
         secure_get_with_token("/secure_api/get_books", function(data){console.log("got books"); console.log(data)},
                         function(err){ console.log(err) });
   }
-  
+
+/*
   async function getbookstore(){
       $("#login").hide();
       $("#cart-form").hide();
@@ -259,7 +260,7 @@
       $("#cart-form").show();
       
   }
-  
+ */
 </script>
 </body>
 </html>
