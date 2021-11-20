@@ -19,10 +19,14 @@ global JWT
 def handle_request():
     logger.debug("Signup Handle Request")
 
-    username = request.form.get('username')
-    password = request.form.get('password')
+    password = request.form['password']
+    username = request.form['username']
 
     cur = g.db.cursor()
+
+    user = {
+            "sub" : request.form['username'] #sub is used by pyJwt as the owner of the token
+            }
 
     cur.execute("select username from users where username = '" + username + "';")
     userid = cur.fetchone()
@@ -31,13 +35,13 @@ def handle_request():
         print("That username already exists, try another")
         return json_response(data={"message:" + username + " already exists!"})
     else:
-        saltedpassword = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt(10))
+        saltedpassword = bcrypt.hashpw( bytes(password, 'utf-8'), bcrypt.gensalt(10))
 
         cur.execute("insert into users (username, password) VALUES ('"
-                    + username + "', '" + saltedpassword.decode('utf-8') + "');")
+                    + username + "', '" + saltedpassword.decode('utf-8') + "');", (user['sub'], saltedpassword.decode('utf-8')))
         cur.close()
         g.db.commit()
 
         print("Created the following user: " + username)
-        encoded_JWT=jwt.encode({'username':username,'password':saltedpassword.decode('utf-8')}, g.secrets['JWT'], algorithm="HS256")
+
         return json_response(data={"message": username +" created successfully."})

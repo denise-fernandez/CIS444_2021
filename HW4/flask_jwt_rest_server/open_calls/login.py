@@ -23,7 +23,7 @@ def handle_request():
             }
 
     cur = g.db.cursor()
-    cur.execute("select * from users where username = '" + request.form['username'] + "';")
+    cur.execute("select * from users where username = '" + user['sub'] + "';")
     dbcredz = cur.fetchone()
     cur.close()
     #print(dbcredz)
@@ -32,13 +32,10 @@ def handle_request():
         logger.debug("No User")
         return json_response(status_=401, message = 'No user exists', authenticated =  False )
     else:
-        if bcrypt.checkpw(bytes(pfu, "utf-8"), bytes(dbcredz[2], "utf-8")) == True:
+        if bcrypt.checkpw(bytes(pfu, 'utf-8'), bytes(dbcredz[2], 'utf-8')) == True:
             logger.debug("Successful Login for : " + request.form['username'] )
             return json_response( token= create_token(user), authenticated = True)
         else:
             return json_response(status_ = 401, data={"message": "Incorrect Password"}, authenticated = False)
 
-    if not user:
-        return json_response(status_=401, message = 'Invalid credentials', authenticated =  False )
 
-    return json_response( token = create_token(user) , authenticated = True)
