@@ -210,8 +210,6 @@
   }
 
   function signup(){
-      $("#login").hide();
-      $("#signup").show();
       
       $.post("/open_api/signup", { 
           "username": $('#newuser').val(), "password": $('#newpassword').val() },
