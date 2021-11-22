@@ -97,10 +97,10 @@
         <div id="credbox">
 	   <h2>Signup</h2>
            <label>Username:</label><br>
-                <input type="text" id="#username2" name="username"><br>
+                <input type="text" id="#newuser" name="newuser"><br>
            <label>Password:</label><br>
-                <input type="password"required id="#password2" name="password" ><br><br>
-           <button type="button" onclick="return signup()">Signup</button>
+                <input type="password"required id="#newpassword" name="newpassword" ><br><br>
+           <input type="submit" value="Signup" onclick="return signup();">
          <h3>Go back to login page</h3>
                 <button type="button" onclick="return loginform()">Login Page</button>
 
@@ -124,7 +124,7 @@
 	</tr>
       </tbody>
   </table>
-
+  <button id="signout" onclick="signout()">Sign Out</button>
   <button id="showCart" onclick="showCart()">Go to your Cart</button>
 </div>
 </div>
@@ -145,7 +145,7 @@
         </tr>
       </tbody>
   </table>
-     <button id="showBookstore" onclick=" return bookstore()">Go back to bookstore</button>
+     <button id="showBookstore" onclick="return loginform()">Goodbye</button>
 
  </div>
 </div>
@@ -182,85 +182,126 @@
   function signupform(){
       $("#login").hide();
       $("#signup").show();
+      $("#booktable-form").hide();
+      $("#booktable-table").hide();
+      $("#cart-form").hide();
+      $("#cart-table").hide();
   }
 
   function loginform(){
       $("#login").show();
       $("#signup").hide();
+      $("#booktable-form").hide();
+      $("#booktable-table").hide();
+      $("#cart-form").hide();
+      $("#cart-table").hide();
   }
 
+  function showbookstore(){
+      $("#booktable-form").show();
+      $("#booktable-table").show();
 
-  async function signup(){
+  }
+
+  
+  function signout(){
+      jwt = null
+      
+  }
+
+  function signup(){
       $("#login").hide();
       $("#signup").show();
-      const response = await $.post("/open_api/signup",{
-	  "username": document.getElementById("#username2").value,
-	  "password": document.getElementById("#password2").value }, "json");
-      token = response.data;
-
-      return true;
+      
+      $.post("/open_api/signup", { 
+          "username": $('#newuser').val(), "password": $('#newpassword').val() },
+          function(data, textStatus) {
+                //this gets called when browser receives response from server
+                console.log("In signup");
+  	        jwt=data.token;
+		get_books();
+        }, "json").fail(function(response){
+                console.log("error in signup() index.html");
+                console.log(response);
+        });
+        return false;
   }
 
   function get_books(){
-	$('#login').hide();
+	$("#login").hide();
+        $("#cart-form").hide();
+        $("#cart-table").hide();
+        $("#booktable-table").show();
+        $("#booktable-form").show();
+
 	console.log("in get_books()");
-        secure_get_with_token("/secure_api/get_books", function(data){console.log("got books"); console.log(data)},
-                        function(err){ console.log(err) });
-  }
+    
+        secure_get_with_token("/secure_api/get_books", 
+             function(data){
+                console.log("got books"); console.log(data)
+                table = document.getElementById("booktable-table");
+             for( var i=0; i< (data.data.books).length; i++) {
+          	   row = table.insertRow(i+1);
+          	   cell1 = row.insertCell(0);
+          	   cell2 = row.insertCell(1);
+          	   cell3 = row.insertCell(2);
+          	   cell4 = row.insertCell(3);
+          	   cell1.innerHTML = data.data.books[i].id;
+          	   cell2.innerHTML = data.data.books[i].name;
+          	   cell3.innerHTML = data.data.books[i].price;
+          	   cell4.innerHTML = '<button onclick="addCart(\'' + data.data.books[i].name + '\')">Buy</button>';
+             }
 
-/*
-  async function getbookstore(){
-      $("#login").hide();
-      $("#cart-form").hide();
-      $("#cart-table").hide();
-      $("#booktable-table").show();
-      console.log("in getbookstore()");
-      console.log(token.jwt);
-      const response = await $.get("/secure_api/getbookstore", {"jwt": token.jwt }, "json");
-      table = document.getElementById("booktable-table");
-      
-      for(i=0; i<response.token.books.length; i++) {
-	  row = table.insertRow(i+1);
-	  cell1 = row.insertCell(0);
-	  cell2 = row.insertCell(1);
-	  cell3 = row.insertCell(2);
-	  cell4 = row.insertCell(3);
-	  cell1.innerHTML = response.token.books[i].id;
-	  cell2.innerHTML = response.token.books[i].name;
-	  cell3.innerHTML = response.token.books[i].price;
-	  cell4.innerHTML = '<button onclick="addCart(\'' + response.token.books[i].name + '\')">Buy</button>';
-      }
-     
-      $("#booktable-form").show();
+             },
+        function(err){ console.log(err) });
+   }
 
-  }
 
-  async function addCart(id) {
-      const response = await $.post("/secure_api/cart",{"id": id}, "json");
+  function addCart(name) {
+      console.log("in addCart before post");
+      console.log(name);
+      secure_get_with_data("/secure_api/cart", 
+	{"username":$('#username').val(), "name" : name },
+           function(data) {
+		console.log("in addCart(name)");
+		console.log(name);
+		console.log(data)}, function(err){ console.log(err) });
+
  }
 
-  async function showCart(){
+  function showCart(){
+      $("#booktable-form").hide();
+      $("#booktable-table").hide();
+      $("#cart-table").show();
+      buy();
+  }
+
+  function buy(){
       $("#booktable-form").hide();
       $("#booktable-table").hide();
       $("#cart-table").show();
 
-      const response = await $.get("/buy", {"jwt": token.jwt }, "json");
-      table = document.getElementById("cart-table");
-      
-      for(i=0; i<response.data.buylist.length; i++) {
-          row = table.insertRow(i+1);
-          cell1 = row.insertCell(0);
-          cell2 = row.insertCell(1);
-          cell3 = row.insertCell(2);
-          cell1.innerHTML = response.data.buylist[i].id;
-          cell2.innerHTML = response.data.buylist[i].name;
-          cell3.innerHTML = response.data.buylist[i].price;
-      }
+      secure_get_with_token("/secure_api/buy",
+           function(data){
+              console.log("in buy"); console.log(data);
+              table = document.getElementById("cart-table");
+
+              for(i=0; i< (data.data.buylist).length; i++) {
+                  row = table.insertRow(i+1);
+                  cell1 = row.insertCell(0);
+                  cell2 = row.insertCell(1);
+                  cell3 = row.insertCell(2);
+                  cell1.innerHTML = data.data.buylist[i].id;
+                  cell2.innerHTML = data.data.buylist[i].name;
+                  cell3.innerHTML = data.data.buylist[i].price;
+              }
 
       $("#cart-form").show();
-      
+
+      });
   }
- */
+
+
 </script>
 </body>
 </html>
