@@ -97,9 +97,9 @@
         <div id="credbox">
 	   <h2>Signup</h2>
            <label>Username:</label><br>
-                <input type="text" id="#newuser" name="newuser"><br>
+                <input type="text" id="newuser" name="newuser"><br>
            <label>Password:</label><br>
-                <input type="password"required id="#newpassword" name="newpassword" ><br><br>
+                <input type="password"required id="newpassword" name="newpassword" ><br><br>
            <input type="submit" value="Signup" onclick="return signup();">
          <h3>Go back to login page</h3>
                 <button type="button" onclick="return loginform()">Login Page</button>
@@ -212,12 +212,11 @@
   function signup(){
       
       $.post("/open_api/signup", { 
-          "username": $('#newuser').val(), "password": $('#newpassword').val() },
+          "newuser": $('#newuser').val(), "newpassword": $('#newpassword').val() },
           function(data, textStatus) {
                 //this gets called when browser receives response from server
                 console.log("In signup");
   	        jwt=data.token;
-		get_books();
         }, "json").fail(function(response){
                 console.log("error in signup() index.html");
                 console.log(response);
