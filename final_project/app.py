@@ -7,6 +7,7 @@ import datetime
 import bcrypt
 import traceback
 
+
 from db_con import get_db_instance, get_db
 
 from tools.token_required import token_required
@@ -14,9 +15,10 @@ from tools.get_aws_secrets import get_secrets
 
 from tools.logging import logger
 
-ERROR_MSG = "Houston, we have a problem..."
+ERROR_MSG = "Ooops.. Didn't work!"
 
 DEBUG = True
+
 
 #Create our app
 app = Flask(__name__)
@@ -34,7 +36,7 @@ def init_new_env():
 #So.. we redirect to the endpoint we want to load the base page
 @app.route('/') #endpoint
 def index():
-    print("Made contact")
+    print("made contact")
     return redirect('/static/index.html')
 
 
@@ -87,4 +89,3 @@ def exec_proc(proc_name):
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80)
-    
