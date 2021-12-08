@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://code.jquery.com/jquery-3.6.0.js"
+                integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+        <script src="/static/cis444.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
+    </head>
+    <body>
+
+        <script>
+            function login(){
+                $("#login").show();
+                $("#signup").hide();
+                    
+                $.post("/open_api/login",{
+                    "username": $('#username').val(), "password":$('#password').val() },
+                function(data, textStatus) {
+                    //this gets called when browser receives response from server
+                    console.log(data.token);
+                    //Set global JWT
+                    jwt = data.token;
+                    //make secure call with the jwt
+                    //
+                    }, "json").fail(function(response){
+                    console.log("error");
+                    console.log(response);
+                });
+                return false;
+                
+            }
+
+        </script>
+
+        <form action="" method="POST">
+            <input type="text" class="username" placeholder="User Name"/>
+            <input type="text" class="message" placeholder="Messages"/>
+            <input type="submit"/>
+        </form>
+
+        <div id="login">
+            <h1>Welcome!</h1>
+                <div id="credbox">
+                    <h2>Login</h2>
+                    <label>Username:</label><br>
+                        <input type="text" id="username" name="username"><br>
+                    <label>Password:</label><br>
+                        <input type="password"required id="password" name="password" ><br><br>
+                    <button type="button" onclick="return login()">Log In</button>
+                    <h3>Need an account?</h3>
+                <button type="button" onclick="return signupform()">Create Account</button>
+                </div>
+        </div>
+    </body>
+</html>
