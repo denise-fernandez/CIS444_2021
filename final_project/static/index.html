@@ -22,7 +22,7 @@
                     //Set global JWT
                     jwt = data.token;
                     //make secure call with the jwt
-                    get_msg();
+                    chat_page();
                     }, "json").fail(function(response){
                     console.log("error");
                     console.log(response);
@@ -34,19 +34,13 @@
             function signupform(){
                 $("#login").hide();
                 $("#signup").show();
-                $("#booktable-form").hide();
-                $("#booktable-table").hide();
-                $("#cart-form").hide();
-                $("#cart-table").hide();
+                
             }
 
             function loginform(){
                 $("#login").show();
                 $("#signup").hide();
-                $("#booktable-form").hide();
-                $("#booktable-table").hide();
-                $("#cart-form").hide();
-                $("#cart-table").hide();
+                
             }
 
             function signup(){
@@ -64,21 +58,14 @@
                     return false;
             }
 
-            function get_msg(){
+            function chat_page(){
                 $("#login").hide();
                 $("#messages").show();
 
-                console.log("in get_msg()");
-               
-                secure_get_with_token("/secure_api/chat", 
-                    function(data){
-                        console.log("got chat"); console.log(data);
-                         addMsg(message_input);
-                    },
-                function(err){ console.log(err) });
+                console.log("in chat_page()");
             }
 
-            function addMsg(name) {
+            function send_msg(name) {
                 console.log("in addMsg before post");
                 console.log(name);
                 secure_get_with_data("/secure_api/send_msg", 
@@ -132,7 +119,7 @@
         <h1>Welcome to chat room {{ room }}</h1>
         <form id="message_input_form">
             <input type="text" id="message_input" placeholder="Enter your message here">
-                <button type="submit">Send</button>
+                <button type="submit" onclick="return send_msg(message_input)">Send</button>
         </form>
 
 
