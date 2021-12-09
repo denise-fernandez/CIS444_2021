@@ -16,10 +16,15 @@ from tools.logging import logger
 
 
 def handle_request():
+    logger.debug("{} has joined the room {}".format('username', 'room'))
+    in_jwt = request.args.get("jwt")
+
+    cur = g.db.cursor()
+
     username = request.args.get('username')
     room = request.args.get('room')
 
     if username and room:
         return render_template('chat.html', username=username, room=room)
     else:
-        return redirect(url_for('home'))
+        return redirect(url_for('index'))
