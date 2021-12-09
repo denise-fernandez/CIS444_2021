@@ -69,23 +69,11 @@
                 $("#messages").show();
 
                 console.log("in get_msg()");
-                
+               
                 secure_get_with_token("/secure_api/chat", 
                     function(data){
-                        console.log("got chat"); console.log(data)
-                        table = document.getElementById("msg-table");
-                    for( var i=0; i< (data.data.books).length; i++) {
-                    row = table.insertRow(i+1);
-                    cell1 = row.insertCell(0);
-                    cell2 = row.insertCell(1);
-                    cell3 = row.insertCell(2);
-                    cell4 = row.insertCell(3);
-                    cell1.innerHTML = data.data.books[i].id;
-                    cell2.innerHTML = data.data.books[i].name;
-                    cell3.innerHTML = data.data.books[i].price;
-                    cell4.innerHTML = '<button onclick="addMsg(\'' + data.data.books[i].name + '\')">Send</button>';
-                    }
-
+                        console.log("got chat"); console.log(data);
+                         addMsg(message_input);
                     },
                 function(err){ console.log(err) });
             }
@@ -94,7 +82,7 @@
                 console.log("in addMsg before post");
                 console.log(name);
                 secure_get_with_data("/secure_api/send_msg", 
-                {"username":$('#username').val(), "name" : name },
+                {"username":$('#username').val(), "room": $('#room').val(), "message":$(name).val()  },
                     function(data) {
                     console.log("in addMsg(name)");
                     console.log(name);
