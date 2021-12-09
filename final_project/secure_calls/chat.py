@@ -15,7 +15,7 @@ from tools.token_tools import create_token
 from tools.logging import logger
 
 
-def chat():
+def handle_request():
     username = request.args.get('username')
     room = request.args.get('room')
 
