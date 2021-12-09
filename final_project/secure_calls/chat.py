@@ -24,4 +24,9 @@ def handle_request():
     user = request.form['username']
     rm = request.form['room']
 
-    return json_response( token = create_token(  g.jwt_data ), data = json.loads(user,rm) )
+
+    if user and rm:
+        return render_template('chat.html', username=user, room=rm)
+    else:
+        return redirect(url_for('index.html'))
+    #return json_response( data = json.loads(user,rm) )

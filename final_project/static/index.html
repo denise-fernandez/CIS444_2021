@@ -70,25 +70,9 @@
                 console.log("in chat_page()");
             }
 
-            function send_msg(name) {
-                console.log("in addMsg before post");
-                console.log(name);
-                secure_get_with_data("/secure_api/send_msg", 
-                {"username":$('#username').val(), "room": $('#room').val(), "message":$(name).val()  },
-                    function(data) {
-                    console.log("in addMsg(name)");
-                    console.log(name);
-                    console.log(data)}, function(err){ console.log(err) });
-
-            }
+            
             
         </script>
-
-        <form action="" method="POST">
-            <input type="text" class="username" placeholder="User Name"/>
-            <input type="text" class="message" placeholder="Messages"/>
-            <input type="submit"/>
-        </form>
 
         <div id="login">
             <h1>Welcome!</h1>
@@ -120,12 +104,7 @@
             </div>
         </div>
 
-        <div id="messages"></div>
-        <h1>Welcome to chat room {{ room }}</h1>
-        <form id="message_input_form">
-            <input type="text" id="message_input" placeholder="Enter your message here">
-                <button type="submit" onclick="return send_msg(message_input)">Send</button>
-        </form>
+      
 
 
     </body>
