@@ -16,7 +16,7 @@ from tools.logging import logger
 
 
 def handle_request():
-    logger.debug("{} has joined the room {}".format(request.form['username'], request.form['room']))
+    logger.debug(request.form['username']+" has joined the room "+ request.form['room'])
     in_jwt = request.args.get("jwt")
 
     cur = g.db.cursor()
