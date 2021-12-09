@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for
 from flask import Flask,render_template,request, redirect, url_for, g
-from flask_json import FlaskJSON, JsonError, json_response, as_json
+from flask_json import FlaskJSON, JsonError, json_response, as_json,json
 import jwt
 import psycopg2  
 import sys
@@ -21,10 +21,7 @@ def handle_request():
 
     cur = g.db.cursor()
 
-    username = request.args.get('username')
-    room = request.args.get('room')
+    user = request.args.get('username')
+    rm = request.args.get('room')
 
-    if username and room:
-        return render_template('chat.html', username=username, room=room)
-    else:
-        return redirect(url_for('index'))
+    return json_response( token = create_token(  g.jwt_data ), data = json.loads(user,rm) )
