@@ -16,12 +16,12 @@ from tools.logging import logger
 
 
 def handle_request():
-    logger.debug("{} has joined the room {}".format('username', 'room'))
+    logger.debug("{} has joined the room {}".format(request.form['username'], request.form['room']))
     in_jwt = request.args.get("jwt")
 
     cur = g.db.cursor()
 
-    user = request.args.get('username')
-    rm = request.args.get('room')
+    user = request.form['username']
+    rm = request.form['room']
 
     return json_response( token = create_token(  g.jwt_data ), data = json.loads(user,rm) )

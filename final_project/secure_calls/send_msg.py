@@ -15,7 +15,7 @@ from tools.token_tools import create_token
 from tools.logging import logger
 
 def handle_request():
-    logger.debug("{} has sent message to the room {}: {}".format('#username','room','message'))
+    logger.debug("{} has sent message to the room {}: {}".format(request.form['username'],request.form['room'],request.form['message']))
     in_jwt = request.args.get("jwt")
 
     cur = g.db.cursor()
